@@ -240,3 +240,58 @@ class API(object):
     ##########
     # Account
     ##########
+
+    def account_info(self, username):
+        """ Returns public user profile information. """
+        return self._get('/api/account_info/{}/'.format(username))
+
+    def dashboard(self):
+        """ Returns Open and active trades. """
+        return self._get('/api/dashboard/')
+
+    def dashboard_released(self):
+        """ Returns released trades. """
+        return self._get('/api/dashboard/released/')
+
+    def dashboard_canceled(self):
+        """ Returns canceled trades. """
+        return self._get('/api/dashboard/canceled/')
+
+    def dashboard_closed(self):
+        """ Returns closed trades. """
+        return self._get('/api/dashboard/closed/')
+
+    def logout(self):
+        """ Immediately expires the current access token. """
+        return self._post('/api/logout/')
+
+    def myself(self):
+        """ Return the information of the authenticated user. """
+        return self._get('/api/myself/')
+
+    def notifications(self):
+        """ Returns a list of notifications. """
+        return self._get('/api/notifications/')
+
+    def notifications_mark_as_read(self, notification_id):
+        """ Marks a specific notification as read. """
+        return self._post(
+            '/api/notifications/mark_as_read/{}/'.format(notification_id))
+
+    def pincode(self, pincode):
+        """
+        Checks the given PIN code against the user's currently active PIN code.
+        """
+        return self._get('/api/pincode/', pincode=pincode)
+
+    def real_name_verifiers(self, username):
+        """ Returns a list of real name verifiers of the user. """
+        return self._get('/api/real_name_verifiers/{}/'.format(username))
+
+    def recent_messages(self, **params):
+        """ Returns the 50 latest trade messages.
+
+        Kwargs:
+            params(dict): https://localbitcoins.com/api-docs/#recent-messages
+        """
+        return self._get('/api/recent_messages/', **params)
