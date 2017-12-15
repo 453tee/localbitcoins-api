@@ -295,3 +295,41 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#recent-messages
         """
         return self._get('/api/recent_messages/', **params)
+
+    #########
+    # Wallet
+    #########
+
+    def wallet(self):
+        """ Returns information about the token owner's wallet balance. """
+        return self._get('/api/wallet/')
+
+    def wallet_balance(self):
+        """
+        Same as /api/wallet/ but only returns the fields message,
+        receiving_address and total.
+        """
+        return self._get('/api/wallet-balance/')
+
+    def wallet_send(self, address, amount):
+        """ Sends amount bitcoins from the token owner's wallet to address. """
+        return self._post('/api/wallet-send/', address=address, amount=amount)
+
+    def wallet_send_pin(self, address, amount, pincode):
+        """
+        Sends amount of bitcoins from the token owner's wallet to address,
+        requires PIN.
+        """
+        return self._post(
+            '/api/wallet-send-pin/', address=address, amount=amount,
+            pincode=pincode)
+
+    def wallet_addr(self):
+        """
+        Gets the latest unused receiving address for the token owner's wallet.
+        """
+        return self._post('/api/wallet-addr/')
+
+    def fees(self):
+        """ Returns outgoing and deposit fees in bitcoins (BTC). """
+        return self._get('/api/fees/')
