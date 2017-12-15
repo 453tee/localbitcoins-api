@@ -17,7 +17,7 @@ class API(object):
         self.hmac_auth_secret = hmac_auth_secret
         self.debug = debug
 
-    def request(self, endpoint, method='get', **params):
+    def _request(self, endpoint, method='get', **params):
         encoded_params = ''
         if params:
             encoded_params = urllib.urlencode(params)
@@ -53,7 +53,15 @@ class API(object):
 
         return json.loads(response.text)
 
+    def _get(self, endpoint, **params):
+        return self._request(endpoint, method='get', **params)
+
+    def _post(self, endpoin, **params):
+        return self._request(endpoin, method='post', **params)
+
+    #################
     # Advertisements
+    #################
     def ads(self, **params):
         """ Returns all advertisements of the authenticated user.
 
@@ -61,15 +69,15 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#ads
 
         """
-        return self.request('/api/ads/', **params)
+        return self._get('/api/ads/', **params)
 
     def ad_get(self, ad_id):
         """ Returns information on a single advertisement. """
-        return self.request('/api/ad-get/{}/'.format(ad_id))
+        return self._get('/api/ad-get/{}/'.format(ad_id))
 
-    def ad_get_list(self, ads):
+    def ads_get(self, ads):
         """ Returns all ads from a list of comma separated ad ID's. """
-        return self.request('/api/ad-get/', ads=ads)
+        return self._get('/api/ad-get/', ads=ads)
 
     def ad_update(self, ad_id, **params):
         """ Update advertisement.
@@ -78,7 +86,7 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#ad-id
 
         """
-        return self.request('/api/ad/{}/'.format(ad_id), method='post', **params)
+        return self._post('/api/ad/{}/'.format(ad_id), **params)
 
     def ad_create(self, **params):
         """ Create a new advertisement.
@@ -87,7 +95,7 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#ad-create
 
         """
-        return self.request('/api/ad-create/', method='post', **params)
+        return self._post('/api/ad-create/', **params)
 
     def ad_equation(self, ad_id, **params):
         """ Update equation of an advertisement.
@@ -96,30 +104,29 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#ad-equation-id
 
         """
-        return self.request(
-            '/api/ad-equation/{}/'.format(ad_id), method='post', **params)
+        return self._post('/api/ad-equation/{}/'.format(ad_id), **params)
 
     def ad_delete(self, ad_id):
         """ Remove an advertisement. """
-        return self.request('/api/ad-delete/{}/'.format(ad_id), method='post')
+        return self._post('/api/ad-delete/{}/'.format(ad_id))
 
     def payment_methods(self):
         """ Returns a list of valid payment methods. """
-        return self.request('/api/payment_methods/')
+        return self._get('/api/payment_methods/')
 
     def payment_methods_countrycode(self, countrycode):
         """
         Returns a list of valid payment methods for a specific country code.
         """
-        return self.request('/api/payment_methods/{}/'.format(countrycode))
+        return self._get('/api/payment_methods/{}/'.format(countrycode))
 
     def countrycodes(self):
         """ List of valid countrycodes for LocalBitcoins. """
-        return self.request('/api/countrycodes/')
+        return self._get('/api/countrycodes/')
 
     def currencies(self):
         """ List of valid and recognized fiat currencies for LocalBitcoins. """
-        return self.request('/api/currencies/')
+        return self._get('/api/currencies/')
 
     def places(self, **params):
         """
@@ -130,17 +137,18 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#places
 
         """
-        return self.request('/api/places/', **params)
+        return self._get('/api/places/', **params)
 
+    #########
     # Trades
+    #########
     def feedback(self, username, **params):
         """ Gives feedback to a user.
 
         Kwargs:
             params(dict): https://localbitcoins.com/api-docs/#feedback
         """
-        return self.request(
-            '/api/feedback/{}/'.format(username), method='post', **params)
+        return self._post('/api/feedback/{}/'.format(username), **params)
 
     def contact_release(self, contact_id, **params):
         """ Release a trade (does not require money_pin).
@@ -149,9 +157,8 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#contact-release
 
         """
-        return self.request(
-            '/api/contact_release/{}/'.format(contact_id), method='post',
-            **params)
+        return self._post(
+            '/api/contact_release/{}/'.format(contact_id), **params)
 
     def contact_release_pin(self, contact_id, **params):
         """ Release a trade (Requires money_pin).
@@ -160,18 +167,16 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#contact-release-pin
 
         """
-        return self.request(
-            '/api/contact_release_pin/{}/'.format(contact_id), method='post',
-            **params)
+        return self._post(
+            '/api/contact_release_pin/{}/'.format(contact_id), **params)
 
     def contact_mark_as_paid(self, contact_id):
         """ Mark a trade as paid. """
-        return self.request(
-            '/api/contact_mark_as_paid/{}/'.format(contact_id), method='post')
+        return self._post('/api/contact_mark_as_paid/{}/'.format(contact_id))
 
     def contact_messages(self, contact_id):
         """ Return all chat messages from a specific trade ID. """
-        return self.request('/api/contact_messages/{}/'.format(contact_id))
+        return self._get('/api/contact_messages/{}/'.format(contact_id))
 
     def contact_message_post(self, contact_id, **params):
         """ Post a chat message to a specific trade ID.
@@ -179,9 +184,8 @@ class API(object):
         Kwargs:
             params(dict): https://localbitcoins.com/api-docs/#contact-post
         """
-        return self.request(
-            '/api/contact_message_post/{}/'.format(contact_id), method='post',
-            **params)
+        return self._post(
+            '/api/contact_message_post/{}/'.format(contact_id), **params)
 
     def contact_dispute(self, contact_id, **params):
         """ Starts a dispute on the trade ID.
@@ -190,19 +194,16 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#contact-dispute
 
         """
-        return self.request(
-            '/api/contact_dispute/{}/'.format(contact_id), method='post',
-            **params)
+        return self._post(
+            '/api/contact_dispute/{}/'.format(contact_id), **params)
 
     def contact_cancel(self, contact_id):
         """ Cancels the trade. """
-        return self.request(
-            '/api/contact_cancel/{}/'.format(contact_id), method='post')
+        return self._post('/api/contact_cancel/{}/'.format(contact_id))
 
     def contact_fund(self, contact_id):
         """ Fund an unfunded Local trade from your LocalBitcoins wallet. """
-        return self.request(
-            '/api/contact_fund/{}/'.format(contact_id), method='post')
+        return self._post('/api/contact_fund/{}/'.format(contact_id))
 
     def contact_mark_realname(self, contact_id, **params):
         """ Mark realname confirmation.
@@ -211,14 +212,12 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#contact-mark-realname
 
         """
-        return self.request(
-            '/api/contact_mark_realname/{}/'.format(contact_id), method='post',
-            **params)
+        return self._post(
+            '/api/contact_mark_realname/{}/'.format(contact_id), **params)
 
     def contact_mark_identified(self, contact_id):
         """ Mark verification of trade partner as confirmed. """
-        return self.request(
-            '/api/contact_mark_identified/{}/'.format(contact_id), method='post')
+        return self._post('/api/contact_mark_identified/{}/'.format(contact_id))
 
     def contact_create(self, ad_id, **params):
         """ Start a trade from an advertisement.
@@ -226,15 +225,73 @@ class API(object):
         Kwargs:
             params(dict): https://localbitcoins.com/api-docs/#contact-create
         """
-        return self.request(
-            '/api/contact_create/{}/'.format(ad_id), method='post', **params)
+        return self._post('/api/contact_create/{}/'.format(ad_id), **params)
 
     def contact_info(self, contact_id):
         """ Return information about a single trade ID. """
-        return self.request('/api/contact_info/{}/'.format(contact_id))
+        return self._get('/api/contact_info/{}/'.format(contact_id))
 
-    def contact_info_list(self, contacts):
+    def contacts_info(self, contacts):
         """
         Return information on your trades using a comma separated list input.
         """
-        return self.request('/api/contact_info/', contacts=contacts)
+        return self._get('/api/contact_info/', contacts=contacts)
+
+    ##########
+    # Account
+    ##########
+
+    def account_info(self, username):
+        """ Returns public user profile information. """
+        return self._get('/api/account_info/{}/'.format(username))
+
+    def dashboard(self):
+        """ Returns Open and active trades. """
+        return self._get('/api/dashboard/')
+
+    def dashboard_released(self):
+        """ Returns released trades. """
+        return self._get('/api/dashboard/released/')
+
+    def dashboard_canceled(self):
+        """ Returns canceled trades. """
+        return self._get('/api/dashboard/canceled/')
+
+    def dashboard_closed(self):
+        """ Returns closed trades. """
+        return self._get('/api/dashboard/closed/')
+
+    def logout(self):
+        """ Immediately expires the current access token. """
+        return self._post('/api/logout/')
+
+    def myself(self):
+        """ Return the information of the authenticated user. """
+        return self._get('/api/myself/')
+
+    def notifications(self):
+        """ Returns a list of notifications. """
+        return self._get('/api/notifications/')
+
+    def notifications_mark_as_read(self, notification_id):
+        """ Marks a specific notification as read. """
+        return self._post(
+            '/api/notifications/mark_as_read/{}/'.format(notification_id))
+
+    def pincode(self, pincode):
+        """
+        Checks the given PIN code against the user's currently active PIN code.
+        """
+        return self._get('/api/pincode/', pincode=pincode)
+
+    def real_name_verifiers(self, username):
+        """ Returns a list of real name verifiers of the user. """
+        return self._get('/api/real_name_verifiers/{}/'.format(username))
+
+    def recent_messages(self, **params):
+        """ Returns the 50 latest trade messages.
+
+        Kwargs:
+            params(dict): https://localbitcoins.com/api-docs/#recent-messages
+        """
+        return self._get('/api/recent_messages/', **params)
