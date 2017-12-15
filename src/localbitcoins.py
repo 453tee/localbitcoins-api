@@ -295,3 +295,43 @@ class API(object):
             params(dict): https://localbitcoins.com/api-docs/#recent-messages
         """
         return self._get('/api/recent_messages/', **params)
+
+    ###########
+    # Invoices
+    ###########
+
+    def invoices(self):
+        """ Lists all invoices created. """
+        return self._get('/api/merchant/invoices/')
+
+    def new_invoice(
+            self, currency, amount, description, internal=None, return_url=None):
+        """ Create a new invoice.
+
+        Args:
+            # Required
+            currency(str): Three letter currency code.
+            amount(float): The amount in the specified currency.
+            description(str):
+            # Optional
+            internal(bool): 1 to limit payments to LocalBitcoins accounts,
+                0 to allow payments from any Bitcoin wallet
+            return_url(str): URL to automatically redirect customers to after
+                invoice is paid.
+        """
+        params = {}
+        if internal is not None:
+            params['internal'] = int(internal)
+        if return_url is not None:
+            params['return_url'] = return_url
+        return self._post(
+            '/api/merchant/new_invoice/', currency=currency, amount=amount,
+            description=description, **params)
+
+    def invoice(self, invoice_id):
+        """ Returns information on a specific invoice ID. """
+        return self._get('/api/merchant/invoice/{}/'.format(invoice_id))
+
+    def delete_invoice(self, invoice_id):
+        """ Deletes a specific invoice ID. """
+        return self._post('/api/merchant/delete_invoice/{}/'.format(invoice_id))
