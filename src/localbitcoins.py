@@ -373,3 +373,62 @@ class API(object):
     def delete_invoice(self, invoice_id):
         """ Deletes a specific invoice ID. """
         return self._post('/api/merchant/delete_invoice/{}/'.format(invoice_id))
+
+    #####################
+    # Public Data Market
+    #####################
+
+    def buy_bitcoins_with_cash(self, location_id, location_slug):
+        """ Returns local buy advertisements. """
+        return self._get('/buy-bitcoins-with-cash/{}/{}/.json'.format(
+            location_id, location_slug))
+
+    def sell_bitcoins_for_cash(self, location_id, location_slug):
+        """ Returns local sell advertisements. """
+        return self._get('/sell-bitcoins-for-cash/{}/{}/.json'.format(
+            location_id, location_slug))
+
+    def _get_online_endpoint(
+            self, endpoint, countrycode, country_name, payment_method, currency):
+        """ Returns endpoint for current parameters. """
+        if countrycode and country_name:
+            endpoint += countrycode + '/' + country_name + '/'
+        elif currency:
+            endpoint += currency + '/'
+
+        if payment_method:
+            endpoint += payment_method + '/'
+        return '{}.json'.format(endpoint)
+
+    def buy_bitcoins_online(
+            self, countrycode=None, country_name=None, payment_method=None,
+            currency=None):
+        """ Returns buy Bitcoin online ads. """
+        endpoint = self._get_online_endpoint(
+            '/buy-bitcoins-online/', countrycode, country_name, payment_method,
+            currency)
+        return self._get(endpoint)
+
+    def sell_bitcoins_online(
+            self, countrycode=None, country_name=None, payment_method=None,
+            currency=None):
+        """ Return sell Bticoin online ads. """
+        endpoint = self._get_online_endpoint(
+            '/sell-bitcoins-online/', countrycode, country_name, payment_method,
+            currency)
+        return self._get(endpoint)
+
+    def ticker_all_currencies(self):
+        """
+        Returns a JSON feed of average Bitcoin prices on LocalBitcoins for
+        all currencies.
+        """
+        return self._get('/bitcoinaverage/ticker-all-currencies/')
+
+    def trades(self, currency):
+        """ Returns a list of completed trades with amount and FIAT price. """
+        return self._get('/bitcoincharts/{}/trades.json'.format(currency))
+
+    def orderbook(self, currency):
+        """ Returns a list of online buy and sell advertisements. """
+        return self._get('/bitcoincharts/{}/orderbook.json'.format(currency))
